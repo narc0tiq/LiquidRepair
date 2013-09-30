@@ -1,5 +1,6 @@
 package liquidrepair;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 import net.minecraftforge.common.Configuration;
@@ -37,6 +38,7 @@ public class CommonProxy {
 
     public void initBlocks() {
         repairTableBlock = new BlockRepairTable(repairTableBlockID);
+        GameRegistry.registerBlock(repairTableBlock, ItemBlockRepairTable.class, "RepairTable");
     }
 
     public void initLanguage() {
