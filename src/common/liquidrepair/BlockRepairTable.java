@@ -11,7 +11,7 @@ public class BlockRepairTable extends BlockContainer {
     public BlockRepairTable(int id, Material material) {
         super(id, material);
 
-        this.setUnlocalizedName("liquidrepair.block.repairtable");
+        this.setUnlocalizedName(CommonProxy.NAME_REPAIR_TABLE);
         this.setHardness(2.0f);
         this.setCreativeTab(TConstructRegistry.blockTab);
     }

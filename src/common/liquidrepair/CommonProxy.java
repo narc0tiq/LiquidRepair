@@ -8,6 +8,7 @@ import net.minecraftforge.common.Configuration;
 public class CommonProxy {
     public int repairTableBlockID = 1899;
     public BlockRepairTable repairTableBlock;
+    public static final String NAME_REPAIR_TABLE = "liquidrepair.repairtable";
 
     public void init(Configuration config) {
         initConfig(config);
@@ -38,7 +39,7 @@ public class CommonProxy {
 
     public void initBlocks() {
         repairTableBlock = new BlockRepairTable(repairTableBlockID);
-        GameRegistry.registerBlock(repairTableBlock, ItemBlockRepairTable.class, "RepairTable");
+        GameRegistry.registerBlock(repairTableBlock, ItemBlockRepairTable.class, NAME_REPAIR_TABLE);
     }
 
     public void initLanguage() {
