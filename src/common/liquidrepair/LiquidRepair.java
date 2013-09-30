@@ -16,7 +16,7 @@ import net.minecraftforge.common.Configuration;
 public class LiquidRepair {
     @SidedProxy(clientSide="liquidrepair.ClientProxy",
                 serverSide="liquidrepair.CommonProxy")
-    public CommonProxy proxy;
+    public static CommonProxy proxy;
 
     public static Configuration config = null;
 
