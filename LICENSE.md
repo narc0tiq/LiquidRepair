@@ -1,0 +1,1 @@
+resources/common/LICENSE.md
