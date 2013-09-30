@@ -10,7 +10,8 @@ import net.minecraftforge.common.Configuration;
 
 @Mod(modid = "LiquidRepair",
      name = "Liquid Repair",
-     version = "%conf:VERSION%")
+     version = "%conf:VERSION%",
+     dependencies="required-after:TConstruct")
 @NetworkMod(serverSideRequired = false,
             clientSideRequired = true,
             versionBounds="%conf:VERSION_BOUNDS%")
@@ -28,6 +29,6 @@ public class LiquidRepair {
 
     @Mod.Init
     public void init(FMLInitializationEvent event) {
-        proxy.initConfig(config);
+        proxy.init(config);
     }
 }
