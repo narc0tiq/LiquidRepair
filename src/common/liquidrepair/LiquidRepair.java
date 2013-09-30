@@ -12,7 +12,8 @@ import net.minecraftforge.common.Configuration;
      name = "Liquid Repair",
      version = "%conf:VERSION%")
 @NetworkMod(serverSideRequired = false,
-            clientSideRequired = true)
+            clientSideRequired = true,
+            versionBounds="%conf:VERSION_BOUNDS%")
 public class LiquidRepair {
     @SidedProxy(clientSide="liquidrepair.ClientProxy",
                 serverSide="liquidrepair.CommonProxy")
