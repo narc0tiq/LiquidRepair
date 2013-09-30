@@ -1,0 +1,4 @@
+# Default: no dotfiles except explicitly allowed ones
+.*
+!.git*
+!.syntastic_javac_config

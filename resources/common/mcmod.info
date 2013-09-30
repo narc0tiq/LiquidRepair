@@ -1,0 +1,10 @@
+[
+  {
+    "modid": "LiquidRepair",
+    "name": "Liquid Repair",
+    "version": "%conf:VERSION%",
+    "description": "An addon for Tinker's Construct to let you repair tools with molten metal.",
+    "authors": [ "narc0tiq" ],
+    "url": "https://github.com/narc0tiq/LiquidRepair"
+  }
+]
