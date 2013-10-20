@@ -43,6 +43,8 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
     public void updateTankCapacity() {
         if(repairLiquid == null) { return; }
 
+        // Set the tank to accept as much liquid as necessary to fully repair
+        // the tool (toolDamageRatio * maxRepairAmount)
         float ratio = RepairHelper.getDamageRatio(content);
         int repairAmount = MathHelper.ceiling_float_int(ratio * repairLiquid.amount);
 
@@ -59,6 +61,9 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
             return;
         }
 
+        // The fraction of this repair (compared to total durability) is the
+        // ratio of how much is in the tank versus how much a full repair would
+        // cost.
         float fraction = (float) tankContent.amount / (float) repairLiquid.amount;
         if(RepairHelper.performRepair(content, fraction)) {
             tank.drain(tankContent.amount, true);
