@@ -1,12 +1,11 @@
 package liquidrepair;
 
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.liquids.LiquidStack;
@@ -14,9 +13,7 @@ import net.minecraftforge.liquids.LiquidTank;
 import net.minecraftforge.liquids.ILiquidTank;
 import net.minecraftforge.liquids.ITankContainer;
 
-import mods.tinker.tconstruct.TConstruct;
-import mods.tinker.tconstruct.library.crafting.CastingRecipe;
-import mods.tinker.tconstruct.library.tools.ToolCore;
+import liquidrepair.util.RepairHelper;
 
 public class TileEntityRepairTable extends TileEntity implements ISidedInventory, ITankContainer {
     public ItemStack content;
@@ -28,62 +25,14 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
         tank = new LiquidTank(null, 0, this);
     }
 
-    public boolean isRepairable(ItemStack is) {
-        if(is == null) { return false; }
-
-        Item item = is.getItem();
-        // TODO: This is WRONG! Tinker tools keep their damage value in NBT!
-        // However, for now, it'll do.
-        return item instanceof ToolCore && item.getDamage(is) > 0;
-    }
-
-    public ToolCore getTool() {
-        if(content == null || !(content.getItem() instanceof ToolCore)) {
-            return null;
-        }
-        return (ToolCore) content.getItem();
-    }
-
-    public boolean isContentRepaired() {
-        ToolCore tool = getTool();
-        if(tool == null) { return true; }
-
-        // TODO: This is still WRONG! Just like above.
-        return tool.getDamage(content) < 1;
-    }
-
-    @SuppressWarnings("unchecked")
-    public LiquidStack findLiquidFor(Item headItem) {
-        if(headItem == null) {
-            return null;
-        }
-
-        // The only reason I need the typecast is because I'm developing
-        // against a deobfuscated TConstruct; remove it (and the
-        // @SuppressWarnings above) if you're using the real source.
-        List<CastingRecipe> recipes = (List<CastingRecipe>)
-                                      TConstruct.tableCasting.getCastingRecipes();
-        for(CastingRecipe recipe: recipes) {
-            if(recipe.output.itemID == headItem.itemID) {
-                return recipe.castingMetal;
-            }
-        }
-
-        return null;
-    }
-
     public void resetTank() {
         tank.setCapacity(0);
-        repairLiquid = null;
+        repairLiquid = RepairHelper.findLiquidFor(content);
 
-        if(content == null || !(content.getItem() instanceof ToolCore) || isContentRepaired()) {
-            return;
-        }
+        float ratio = RepairHelper.getDamageRatio(content);
+        repairLiquid.amount = MathHelper.ceiling_float_int(ratio * repairLiquid.amount);
 
-        ToolCore tool = (ToolCore) content.getItem();
-        repairLiquid = findLiquidFor(tool.getHeadItem());
-        // TODO: Scale repairLiquid's quantity by tool damage, use it to set
-        // tank's capacity.
+        tank.setCapacity(repairLiquid.amount);
     }
 
 //public interface ISidedInventory extends IInventory {
@@ -92,7 +41,7 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
 
     @Override
     public boolean canExtractItem(int slot, ItemStack is, int side) {
-        return slot == 0 && isContentRepaired();
+        return slot == 0 && RepairHelper.getDamageRatio(content) <= 0.0;
     }
 //}
 
@@ -150,7 +99,7 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
             return false;
         }
 
-        return isRepairable(is);
+        return RepairHelper.isRepairable(is);
     }
 
     @Override
