@@ -139,6 +139,10 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
         return ret;
     }
 
+    public boolean isStackInSlot(int slot) {
+        return slot == 0 && content != null;
+    }
+
     @Override
     public ItemStack getStackInSlot(int slot) {
         if(slot != 0) {
