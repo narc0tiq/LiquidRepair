@@ -31,3 +31,8 @@ available in this package in the file [LICENSE.md](LICENSE.md).
 Textures, models, etc., are keenly desired, but requested to be licensed under
 a [Creative Commons Attribution](https://creativecommons.org/licenses/by/3.0/)
 license. Any contributions will be greatly appreciated.
+
+
+## Statistics ##
+
+8 tinker tools were harmed during the creation of this mod.
