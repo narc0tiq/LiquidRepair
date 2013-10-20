@@ -21,6 +21,6 @@ public class BlockRepairTable extends BlockContainer {
     }
 
     public TileEntity createNewTileEntity(World world) {
-        return null;
+        return new TileEntityRepairTable();
     }
 }

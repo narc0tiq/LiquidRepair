@@ -12,6 +12,7 @@ import net.minecraftforge.liquids.LiquidStack;
 
 import mods.tinker.tconstruct.TConstruct;
 import mods.tinker.tconstruct.library.crafting.CastingRecipe;
+import mods.tinker.tconstruct.library.tools.AbilityHelper;
 import mods.tinker.tconstruct.library.tools.ToolCore;
 
 public class RepairHelper {
@@ -40,7 +41,8 @@ public class RepairHelper {
             return null;
         }
 
-        return findLiquidFor(head, tool.getItemDamage());
+        int headMaterial = tool.getTagCompound().getCompoundTag("InfiTool").getInteger("Head");
+        return findLiquidFor(head, headMaterial);
     }
 
     public static HashMap<HashStack, LiquidStack> liquidMap = new HashMap<HashStack, LiquidStack>();
@@ -58,6 +60,9 @@ public class RepairHelper {
         HashStack toolPartStack = new HashStack(new ItemStack(toolPart, 1, materialID));
 
         if(liquidMap.containsKey(toolPartStack)) {
+            if(liquidMap.get(toolPartStack) == null) {
+                return null;
+            }
             return liquidMap.get(toolPartStack).copy();
         }
 
@@ -71,6 +76,8 @@ public class RepairHelper {
             }
         }
 
+        // Cache negatives, too.
+        liquidMap.put(toolPartStack, null);
         return null;
     }
 
@@ -126,6 +133,8 @@ public class RepairHelper {
         damage -= repairAmount;
         if(damage < 0) { damage = 0; }
         tag.setInteger("Damage", damage);
+
+        AbilityHelper.damageTool(tool, 0, null, true);
 
         return true;
     }

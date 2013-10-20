@@ -153,11 +153,12 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
             return false;
         }
 
-        return RepairHelper.isRepairable(is);
+        return RepairHelper.isTool(is);
     }
 
     @Override
     public void onInventoryChanged() {
+        resetTank();
         worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
     }
 
@@ -174,7 +175,6 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
 //public interface ITankContainer {
     @Override
     public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
-        // We have no tanks for the wrong liquid (but null liquids are fine)
         if(!isRepairLiquid(type)) {
             return null;
         }
