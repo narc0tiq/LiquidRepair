@@ -14,6 +14,7 @@ import mods.tinker.tconstruct.TConstruct;
 import mods.tinker.tconstruct.library.crafting.CastingRecipe;
 import mods.tinker.tconstruct.library.tools.AbilityHelper;
 import mods.tinker.tconstruct.library.tools.ToolCore;
+import mods.tinker.tconstruct.library.util.IPattern;
 
 public class RepairHelper {
     public static boolean isTool(ItemStack possibleTool)
@@ -71,8 +72,19 @@ public class RepairHelper {
 
         for(CastingRecipe recipe: recipes) {
             if(recipe.output.isItemEqual(toolPartStack.itemStack)) {
-                liquidMap.put(toolPartStack, recipe.castingMetal);
-                return recipe.castingMetal.copy();
+                LiquidStack repairLiquid = recipe.castingMetal.copy();
+
+                // Work around a bug in Tinker's for 1.5.2
+                int cost = ((IPattern) recipe.cast.getItem()).getPatternCost(recipe.cast);
+                repairLiquid.amount = (cost * TConstruct.ingotLiquidValue) / 2;
+                // Ordinarily, the cost should just be the recipe's
+                // castingMetal amount, but the value is incorrectly
+                // initialized, therefore we have to redo it. Of note is that
+                // tinker's casting table also do this! And probably for the
+                // same reason.
+
+                liquidMap.put(toolPartStack, repairLiquid);
+                return repairLiquid;
             }
         }
 
