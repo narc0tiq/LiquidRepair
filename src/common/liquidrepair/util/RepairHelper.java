@@ -6,6 +6,7 @@ import java.util.HashMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
 
 import net.minecraftforge.liquids.LiquidStack;
 
@@ -102,5 +103,30 @@ public class RepairHelper {
 
         return ((float) tag.getInteger("Damage")) /
                ((float) tag.getInteger("BaseDurability"));
+    }
+
+    /**
+     * Repair a tool by a given fraction of its base durability.
+     */
+    public static boolean performRepair(ItemStack tool, float fraction) {
+        if(!isTool(tool) || !isRepairable(tool)) { return false; }
+
+        NBTTagCompound tag = tool.getTagCompound().getCompoundTag("InfiTool");
+        int durability = tag.getInteger("BaseDurability");
+        int repairAmount = MathHelper.ceiling_float_int(fraction * (float) durability);
+
+        if(tag.getBoolean("Broken")) {
+            int repairCount = tag.getInteger("RepairCount");
+            repairCount += 1;
+            tag.setInteger("RepairCount", repairCount);
+            tag.setBoolean("Broken", false);
+        }
+
+        int damage = tag.getInteger("Damage");
+        damage -= repairAmount;
+        if(damage < 0) { damage = 0; }
+        tag.setInteger("Damage", damage);
+
+        return true;
     }
 }

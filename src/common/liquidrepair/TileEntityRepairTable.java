@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 
@@ -25,14 +26,67 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
         tank = new LiquidTank(null, 0, this);
     }
 
+    public boolean isRepairLiquid(LiquidStack resource) {
+        if(resource == null || repairLiquid == null) {
+            return false;
+        }
+        return resource.isLiquidEqual(repairLiquid);
+    }
+
     public void resetTank() {
         tank.setCapacity(0);
         repairLiquid = RepairHelper.findLiquidFor(content);
 
-        float ratio = RepairHelper.getDamageRatio(content);
-        repairLiquid.amount = MathHelper.ceiling_float_int(ratio * repairLiquid.amount);
+        updateTankCapacity();
+    }
 
-        tank.setCapacity(repairLiquid.amount);
+    public void updateTankCapacity() {
+        if(repairLiquid == null) { return; }
+
+        float ratio = RepairHelper.getDamageRatio(content);
+        int repairAmount = MathHelper.ceiling_float_int(ratio * repairLiquid.amount);
+
+        tank.setCapacity(repairAmount);
+    }
+
+    public void attemptRepair() {
+        if(repairLiquid == null) {
+            return;
+        }
+
+        LiquidStack tankContent = tank.getLiquid();
+        if(tankContent == null || !isRepairLiquid(tankContent)) {
+            return;
+        }
+
+        float fraction = (float) tankContent.amount / (float) repairLiquid.amount;
+        if(RepairHelper.performRepair(content, fraction)) {
+            tank.drain(tankContent.amount, true);
+        }
+
+        updateTankCapacity();
+    }
+
+    public boolean initialized = false;
+
+    public void initialize() {
+        resetTank();
+
+        initialized = true;
+    }
+
+    public int repairTimer = 20;
+
+    @Override
+    public void updateEntity() {
+        if(isInvalid()) { return; }
+        if(!initialized) { initialize(); }
+
+        if(repairTimer <= 0) {
+            repairTimer = 20;
+            attemptRepair();
+        }
+        repairTimer -= 1;
     }
 
 //public interface ISidedInventory extends IInventory {
@@ -117,14 +171,8 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
     }
 //}
 
-    public boolean isRepairLiquid(LiquidStack resource) {
-        if(resource == null || repairLiquid == null) {
-            return false;
-        }
-        return resource.isLiquidEqual(repairLiquid);
-    }
-
 //public interface ITankContainer {
+    @Override
     public ILiquidTank getTank(ForgeDirection direction, LiquidStack type) {
         // We have no tanks for the wrong liquid (but null liquids are fine)
         if(!isRepairLiquid(type)) {
@@ -133,14 +181,17 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
         return tank;
     }
 
+    @Override
     public ILiquidTank[] getTanks(ForgeDirection direction) {
         return new ILiquidTank[] { tank };
     }
 
+    @Override
     public int fill(ForgeDirection from, LiquidStack resource, boolean doFill) {
         return fill(0, resource, doFill);
     }
 
+    @Override
     public int fill(int tankIndex, LiquidStack resource, boolean doFill) {
         if(tankIndex != 0 || !isRepairLiquid(resource)) {
             return 0;
@@ -148,15 +199,45 @@ public class TileEntityRepairTable extends TileEntity implements ISidedInventory
         return tank.fill(resource, doFill);
     }
 
+    @Override
     public LiquidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
         return drain(0, maxDrain, doDrain);
     }
 
+    @Override
     public LiquidStack drain(int tankIndex, int maxDrain, boolean doDrain) {
         if(tankIndex != 0) {
             return null;
         }
         return tank.drain(maxDrain, doDrain);
+    }
+//}
+
+//Basic TileEntity stuff {
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+
+        if(tag.hasKey("Content")) {
+            content = ItemStack.loadItemStackFromNBT(tag.getCompoundTag("Content"));
+        }
+
+        tank.readFromNBT(tag.getCompoundTag("Tank"));
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+        super.writeToNBT(tag);
+
+        NBTTagCompound contentTag = new NBTTagCompound();
+        if(content != null) {
+            content.writeToNBT(contentTag);
+            tag.setTag("Content", contentTag);
+        }
+
+        NBTTagCompound tankTag = new NBTTagCompound();
+        tank.writeToNBT(tankTag);
+        tag.setTag("Tank", tankTag);
     }
 //}
 }

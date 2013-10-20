@@ -40,6 +40,7 @@ public class CommonProxy {
     public void initBlocks() {
         repairTableBlock = new BlockRepairTable(repairTableBlockID);
         GameRegistry.registerBlock(repairTableBlock, ItemBlockRepairTable.class, NAME_REPAIR_TABLE);
+        GameRegistry.registerTileEntity(TileEntityRepairTable.class, "liquidrepair.repairtable");
     }
 
     public void initLanguage() {
