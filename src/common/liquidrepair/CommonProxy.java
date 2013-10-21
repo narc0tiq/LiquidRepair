@@ -3,7 +3,14 @@ package liquidrepair;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
+
+import mods.tinker.tconstruct.common.TContent;
 
 public class CommonProxy {
     public int repairTableBlockID = 1899;
@@ -14,7 +21,6 @@ public class CommonProxy {
         initConfig(config);
         initBlocks();
         initLanguage();
-        initTConstruct();
         initRecipes();
     }
 
@@ -53,9 +59,21 @@ public class CommonProxy {
         }
     }
 
-    public void initTConstruct() {
-    }
-
     public void initRecipes() {
+        ItemStack searedBrick = new ItemStack(TContent.materials, 1, 2);
+        ItemStack anvil = new ItemStack(Block.anvil, 1);
+        ItemStack castingTable = new ItemStack(TContent.searedBlock, 1, 0);
+        ItemStack repairTable = new ItemStack(repairTableBlock, 1);
+
+        GameRegistry.addRecipe(new ShapedOreRecipe(repairTable,
+                                                   "bbb",
+                                                   "bab",
+                                                   "b b",
+                                                   'b', searedBrick,
+                                                   'a', anvil));
+
+        GameRegistry.addRecipe(new ShapelessOreRecipe(repairTable,
+                                                      castingTable,
+                                                      anvil));
     }
 }
